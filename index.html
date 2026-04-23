@@ -743,6 +743,27 @@
         padding: 8px;
       }
     }
+  
+    .tg-block{
+      max-width:400px;margin:18px auto;display:flex;align-items:center;gap:14px;
+      padding:14px 16px;border-radius:20px;text-decoration:none;color:#fff;
+      background:linear-gradient(135deg, rgba(0,136,204,0.18), rgba(0,136,204,0.06));
+      border:2px solid rgba(0,136,204,0.45);
+      box-shadow:0 8px 24px rgba(0,136,204,0.18);
+      transition:transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+    }
+    .tg-block:hover{transform:translateY(-2px);box-shadow:0 12px 28px rgba(0,136,204,0.28);border-color:rgba(0,136,204,0.7);}
+    .tg-avatar{width:54px;height:54px;border-radius:50%;object-fit:cover;flex-shrink:0;border:2px solid rgba(0,136,204,0.6);}
+    .tg-info{flex:1;text-align:left;min-width:0;}
+    .tg-title{font-weight:800;font-size:16px;line-height:1.2;}
+    .tg-sub{font-size:12px;color:rgba(255,255,255,0.7);margin-top:2px;}
+    .tg-btn{
+      flex-shrink:0;padding:10px 16px;border-radius:12px;font-weight:700;font-size:13px;
+      background:linear-gradient(135deg,#0088cc,#29b6f6);color:#fff;
+      box-shadow:0 4px 12px rgba(0,136,204,0.4);
+    }
+    @media (max-width:420px){.tg-btn{padding:8px 12px;font-size:12px}.tg-avatar{width:48px;height:48px}}
+
   </style>
 </head>
 
@@ -760,7 +781,7 @@
     </div>
     <span class="live-separator"></span>
     <div>
-      <span class="winners-hour" id="winners-count">+124</span> <span id="winners-text">выиграли за час</span>
+      <span class="winners-hour" id="winners-count">+124</span> <span id="winners-text">выиграли за последний час</span>
     </div>
   </div>
 
@@ -776,7 +797,7 @@
       <!-- Hero Section -->
       <div class="hero-section">
 
-        <div class="section-title" id="section-title"><span>▸</span> ВЫБЕРИ ИГРУ</div>
+        <div class="section-title" id="section-title"><span>▸</span> ВЫБЕРИ СВОЮ ИГРУ</div>
 
         <!-- Games Grid -->
         <div class="games-grid">
@@ -786,7 +807,7 @@
               <img src="image/usd.gif" alt="Mineslot" id="gameplay-gif">
             </div>
             <div class="game-card__name">MINESLOT</div>
-            <a href="https://jetton.tips/chpIiowwgc9?click_id=%7Bclick_id%7D" id="cta-link" target="_blank" class="game-card__cta">
+            <a href="https://jetton.tips/chpIiowwgc9?click_id={click_id}" id="cta-link" target="_blank" class="game-card__cta">
               <svg class="game-card__cta-icon" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M8 5v14l11-7z" />
               </svg>
@@ -801,7 +822,7 @@
               <img src="image/jumper.png" alt="Doodle Jump" id="rushhour-video">
             </div>
             <div class="game-card__name">DOODLE JUMP</div>
-            <a href="https://jetton.tips/chpIiowwgc9?click_id=%7Bclick_id%7D" id="cta-link-rh" target="_blank" class="game-card__cta">
+            <a href="https://jetton.tips/chpIiowwgc9?click_id={click_id}" id="cta-link-rh" target="_blank" class="game-card__cta">
               <svg class="game-card__cta-icon" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M8 5v14l11-7z" />
               </svg>
@@ -828,6 +849,17 @@
           <div class="cta-hint" id="cta-hint">↑ Выбери игру и получи свой бонус ↑</div>
         </div>
 
+        
+        <!-- Telegram Block -->
+        <a href="https://t.me/+oHBsPaMUdiIwNGIy" target="_blank" rel="noopener" class="tg-block">
+          <img src="image/telegram-avatar.png" alt="Telegram" class="tg-avatar">
+          <div class="tg-info">
+            <div class="tg-title">Наш Telegram</div>
+            <div class="tg-sub">Эксклюзивные бонусы и промокоды</div>
+          </div>
+          <span class="tg-btn">Подписаться</span>
+        </a>
+
         <!-- How to Play Button -->
         <button class="how-to-play-btn" id="how-to-play-btn">
           <span id="how-to-play-text">Как играть?</span>
@@ -838,7 +870,7 @@
         <div class="how-to-play-panel" id="how-to-play-panel">
           <div class="step">
             <div class="step-num">1</div>
-            <div class="step-text" id="step-1">Зарегистрируйся, нажав кнопку "Играть"</div>
+            <div class="step-text" id="step-1">Зарегистрируйся, нажав любую кнопку «Играть»</div>
           </div>
           <div class="step">
             <div class="step-num">2</div>
@@ -846,7 +878,7 @@
           </div>
           <div class="step">
             <div class="step-num">3</div>
-            <div class="step-text" id="step-3">Найди "Mine Slot" или "Doodle Jump" в казино</div>
+            <div class="step-text" id="step-3">Найди «Mine Slot» или «Doodle Jump» в казино</div>
           </div>
           <div class="step">
             <div class="step-num">4</div>
@@ -861,234 +893,28 @@
   <script>
     // Конфигурация стран LATAM
     const COUNTRIES_CONFIG = {
-      MX: { // Мексика
-        name: 'México',
-        currency: 'MXN',
-        currencySymbol: '$',
-        flag: '🇲🇽',
-        locale: 'es-MX',
-        offer: 'https://jetton.tips/chpIiowwgc9?click_id=%7Bclick_id%7D',
-        defaultLink: 'https://jetton.tips/chpIiowwgc9?click_id=%7Bclick_id%7D',
-        gif: 'image/mxn.gif',
-        prizes: { min: 2000, max: 50000, bonus: 1000 },
-        text: {
-          cta: 'ИГРАТЬ',
-          bonusTitle: 'СПЕЦИАЛЬНЫЙ БОНУС',
-          liveText: 'играют сейчас',
-          winnersText: 'выиграли за час',
-          howToPlay: 'Как играть?',
-          step1: 'Зарегистрируйся, нажав кнопку "Играть"',
-          step2: 'Пополни счёт на любую сумму',
-          step3: 'Найди "Mine Slot" или "Doodle Jump" в казино',
-          step4: 'Начинай выигрывать!',
-          ctaHint: '↑ Выбери игру и получи свой бонус ↑'
-        }
-      },
-      AR: { // Аргентина
-        name: 'Argentina',
-        currency: 'ARS',
-        currencySymbol: '$',
-        flag: '🇦🇷',
-        locale: 'es-AR',
-        offer: 'https://jetton.tips/chpIiowwgc9?click_id=%7Bclick_id%7D',
-        defaultLink: 'https://jetton.tips/chpIiowwgc9?click_id=%7Bclick_id%7D',
-        gif: 'image/ars.gif',
-        prizes: { min: 50000, max: 2000000, bonus: 25000 },
-        text: {
-          cta: 'ИГРАТЬ',
-          bonusTitle: 'СПЕЦИАЛЬНЫЙ БОНУС',
-          liveText: 'играют сейчас',
-          winnersText: 'выиграли за час',
-          howToPlay: 'Как играть?',
-          step1: 'Зарегистрируйся, нажав кнопку "Играть"',
-          step2: 'Пополни счёт на любую сумму',
-          step3: 'Найди "Mine Slot" или "Doodle Jump" в казино',
-          step4: 'Начинай выигрывать!',
-          ctaHint: '↑ Выбери игру и получи свой бонус ↑'
-        }
-      },
-      CO: { // Колумбия
-        name: 'Colombia',
-        currency: 'COP',
-        currencySymbol: '$',
-        flag: '🇨🇴',
-        locale: 'es-CO',
-        offer: 'https://jetton.tips/chpIiowwgc9?click_id=%7Bclick_id%7D',
-        defaultLink: 'https://jetton.tips/chpIiowwgc9?click_id=%7Bclick_id%7D',
-        gif: 'image/cop.gif',
-        prizes: { min: 50000, max: 5000000, bonus: 200000 },
-        text: {
-          cta: 'ИГРАТЬ',
-          bonusTitle: 'СПЕЦИАЛЬНЫЙ БОНУС',
-          liveText: 'играют сейчас',
-          winnersText: 'выиграли за час',
-          howToPlay: 'Как играть?',
-          step1: 'Зарегистрируйся, нажав кнопку "Играть"',
-          step2: 'Пополни счёт на любую сумму',
-          step3: 'Найди "Mine Slot" или "Doodle Jump" в казино',
-          step4: 'Начинай выигрывать!',
-          ctaHint: '↑ Выбери игру и получи свой бонус ↑'
-        }
-      },
-      CL: { // Чили
-        name: 'Chile',
-        currency: 'CLP',
-        currencySymbol: '$',
-        flag: '🇨🇱',
-        locale: 'es-CL',
-        offer: 'https://jetton.tips/chpIiowwgc9?click_id=%7Bclick_id%7D',
-        defaultLink: 'https://jetton.tips/chpIiowwgc9?click_id=%7Bclick_id%7D',
-        gif: 'image/clp.gif',
-        prizes: { min: 10000, max: 10000000, bonus: 50000 },
-        text: {
-          cta: 'ИГРАТЬ',
-          bonusTitle: 'СПЕЦИАЛЬНЫЙ БОНУС',
-          liveText: 'играют сейчас',
-          winnersText: 'выиграли за час',
-          howToPlay: 'Как играть?',
-          step1: 'Зарегистрируйся, нажав кнопку "Играть"',
-          step2: 'Пополни счёт на любую сумму',
-          step3: 'Найди "Mine Slot" или "Doodle Jump" в казино',
-          step4: 'Начинай выигрывать!',
-          ctaHint: '↑ Выбери игру и получи свой бонус ↑'
-        }
-      },
-      PE: { // Перу
-        name: 'Perú',
-        currency: 'PEN',
-        currencySymbol: 'S/',
-        flag: '🇵🇪',
-        locale: 'es-PE',
-        offer: 'https://jetton.tips/chpIiowwgc9?click_id=%7Bclick_id%7D',
-        defaultLink: 'https://jetton.tips/chpIiowwgc9?click_id=%7Bclick_id%7D',
-        gif: 'image/pen.gif',
-        prizes: { min: 100, max: 50000, bonus: 200 },
-        text: {
-          cta: 'ИГРАТЬ',
-          bonusTitle: 'СПЕЦИАЛЬНЫЙ БОНУС',
-          liveText: 'играют сейчас',
-          winnersText: 'выиграли за час',
-          howToPlay: 'Как играть?',
-          step1: 'Зарегистрируйся, нажав кнопку "Играть"',
-          step2: 'Пополни счёт на любую сумму',
-          step3: 'Найди "Mine Slot" или "Doodle Jump" в казино',
-          step4: 'Начинай выигрывать!',
-          ctaHint: '↑ Выбери игру и получи свой бонус ↑'
-        }
-      },
-      BR: { // Бразилия
-        name: 'Brasil',
-        currency: 'BRL',
-        currencySymbol: 'R$',
-        flag: '🇧🇷',
-        locale: 'pt-BR',
-        offer: 'https://jetton.tips/chpIiowwgc9?click_id=%7Bclick_id%7D',
-        defaultLink: 'https://jetton.tips/chpIiowwgc9?click_id=%7Bclick_id%7D',
-        gif: 'image/brl.gif',
-        prizes: { min: 100, max: 50000, bonus: 250 },
-        text: {
-          cta: 'ИГРАТЬ',
-          bonusTitle: 'СПЕЦИАЛЬНЫЙ БОНУС',
-          liveText: 'играют сейчас',
-          winnersText: 'выиграли за час',
-          howToPlay: 'Как играть?',
-          step1: 'Зарегистрируйся, нажав кнопку "Играть"',
-          step2: 'Пополни счёт на любую сумму',
-          step3: 'Найди "Mine Slot" или "Doodle Jump" в казино',
-          step4: 'Начинай выигрывать!',
-          ctaHint: '↑ Выбери игру и получи свой бонус ↑'
-        }
-      },
-      VE: { // Венесуэла
-        name: 'Venezuela',
-        currency: 'USD',
-        currencySymbol: '$',
-        flag: '🇻🇪',
-        locale: 'es-VE',
-        offer: 'https://jetton.tips/chpIiowwgc9?click_id=%7Bclick_id%7D',
-        defaultLink: 'https://jetton.tips/chpIiowwgc9?click_id=%7Bclick_id%7D',
+      DEFAULT: { // Fallback (RU)
+        name: 'Россия',
+        currency: 'RUB',
+        currencySymbol: '₽',
+        flag: '🇷🇺',
+        locale: 'ru-RU',
+        offer: 'https://jetton.tips/chpIiowwgc9?click_id={click_id}',
+        defaultLink: 'https://jetton.tips/chpIiowwgc9?click_id={click_id}',
         gif: 'image/usd.gif',
-        prizes: { min: 10, max: 1000, bonus: 50 },
+        prizes: { min: 5000, max: 500000, bonus: 25000 },
         text: {
           cta: 'ИГРАТЬ',
           bonusTitle: 'СПЕЦИАЛЬНЫЙ БОНУС',
           liveText: 'играют сейчас',
-          winnersText: 'выиграли за час',
+          winnersText: 'выиграли за последний час',
           howToPlay: 'Как играть?',
-          step1: 'Зарегистрируйся, нажав кнопку "Играть"',
+          step1: 'Зарегистрируйся, нажав кнопку «Играть»',
           step2: 'Пополни счёт на любую сумму',
-          step3: 'Найди "Mine Slot" или "Doodle Jump" в казино',
+          step3: 'Найди «Mine Slot» или «Doodle Jump» в казино',
           step4: 'Начинай выигрывать!',
-          ctaHint: '↑ Выбери игру и получи свой бонус ↑'
-        }
-      },
-      EC: { // Эквадор
-        name: 'Ecuador',
-        currency: 'USD',
-        currencySymbol: '$',
-        flag: '🇪🇨',
-        locale: 'es-EC',
-        offer: 'https://jetton.tips/chpIiowwgc9?click_id=%7Bclick_id%7D',
-        defaultLink: 'https://jetton.tips/chpIiowwgc9?click_id=%7Bclick_id%7D',
-        gif: 'image/usd.gif',
-        prizes: { min: 10, max: 1000, bonus: 50 },
-        text: {
-          cta: 'ИГРАТЬ',
-          bonusTitle: 'СПЕЦИАЛЬНЫЙ БОНУС',
-          liveText: 'играют сейчас',
-          winnersText: 'выиграли за час',
-          howToPlay: 'Как играть?',
-          step1: 'Зарегистрируйся, нажав кнопку "Играть"',
-          step2: 'Пополни счёт на любую сумму',
-          step3: 'Найди "Mine Slot" или "Doodle Jump" в казино',
-          step4: 'Начинай выигрывать!',
-          ctaHint: '↑ Выбери игру и получи свой бонус ↑'
-        }
-      },
-      ES: { // Испания
-        name: 'España',
-        currency: 'EUR',
-        currencySymbol: '€',
-        flag: '🇪🇸',
-        locale: 'es-ES',
-        offer: 'https://jetton.tips/chpIiowwgc9?click_id=%7Bclick_id%7D',
-        defaultLink: 'https://jetton.tips/chpIiowwgc9?click_id=%7Bclick_id%7D',
-        gif: 'image/es.gif',
-        prizes: { min: 10, max: 1000, bonus: 50 },
-        text: {
-          cta: 'ИГРАТЬ',
-          bonusTitle: 'СПЕЦИАЛЬНЫЙ БОНУС',
-          liveText: 'играют сейчас',
-          winnersText: 'выиграли за час',
-          howToPlay: 'Как играть?',
-          step1: 'Зарегистрируйся, нажав кнопку "Играть"',
-          step2: 'Пополни счёт на любую сумму',
-          step3: 'Найди "Mine Slot" или "Doodle Jump" в казино',
-          step4: 'Начинай выигрывать!',
-          ctaHint: '↑ Выбери игру и получи свой бонус ↑'
-        }
-      },
-      DEFAULT: { // Fallback
-        name: 'LATAM',
-        currency: 'USD',
-        currencySymbol: '$',
-        flag: '🌎',
-        locale: 'es',
-        offer: 'https://jetton.tips/chpIiowwgc9?click_id=%7Bclick_id%7D',
-        defaultLink: 'https://jetton.tips/chpIiowwgc9?click_id=%7Bclick_id%7D',
-        gif: 'image/usd.gif',
-        prizes: { min: 10, max: 1000, bonus: 50 },
-        text: {
-          cta: 'ИГРАТЬ',
-          bonusTitle: 'СПЕЦИАЛЬНЫЙ БОНУС',
-          liveText: 'играют сейчас',
-          winnersText: 'выиграли за час',
-          howToPlay: 'Как играть?',
-          step1: 'Зарегистрируйся, нажав кнопку "Играть"',
-          step2: 'Пополни счёт на любую сумму',
-          step3: 'Найди "Mine Slot" или "Doodle Jump" в казино',
-          step4: 'Начинай выигрывать!',
-          ctaHint: '↑ Выбери игру и получи свой бонус ↑'
+          ctaHint: '↑ Выбери игру и получи свой бонус ↑',
+          sectionTitle: 'ВЫБЕРИ СВОЮ ИГРУ'
         }
       }
     };
@@ -1379,8 +1205,8 @@
         } else {
           // Фоллбек: хардкод дефолты (не копируем Mineslot — это другой оффер)
           ctaLinkRh.href = normalizedCode === 'PE'
-            ? 'https://jetton.tips/chpIiowwgc9?click_id=%7Bclick_id%7D'
-            : 'https://jetton.tips/chpIiowwgc9?click_id=%7Bclick_id%7D';
+            ? 'https://jetton.tips/chpIiowwgc9?click_id={click_id}'
+            : 'https://jetton.tips/chpIiowwgc9?click_id={click_id}';
         }
       }
 
@@ -1542,16 +1368,16 @@
                 <div class="warning-icon" style="font-size: 64px; margin-bottom: 20px; animation: pulse 2s infinite;">⚠️</div>
                 <h1 style="font-family: 'Space Grotesk', sans-serif; font-size: 28px; font-weight: 700; color: #f8fafc; margin-bottom: 20px;">Открыть в браузере</h1>
                 <p style="font-size: 18px; color: rgba(248, 250, 252, 0.8); line-height: 1.6; margin-bottom: 30px;">
-                  Чтобы открыть игру, нажмите на <strong>3 точки</strong> в правом верхнем углу и выберите <strong>"Открыть в браузере"</strong>
+                  Чтобы открыть игру, нажмите на <strong>3 точки</strong> в правом верхнем углу и выберите <strong>«Открыть в браузере»</strong>
                 </p>
                 <div style="display: flex; flex-direction: column; gap: 15px; margin-top: 30px;">
                   <div style="display: flex; align-items: center; gap: 15px; padding: 15px 20px; background: linear-gradient(135deg, rgba(124, 92, 255, 0.1), rgba(124, 92, 255, 0.05)); border: 1px solid rgba(124, 92, 255, 0.2); border-radius: 15px; text-align: left;">
                     <div style="width: 35px; height: 35px; background: linear-gradient(135deg, #7c5cff, #9d7fff); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 18px; color: white; flex-shrink: 0;">1</div>
-                    <div style="font-size: 16px; color: rgba(248, 250, 252, 0.9);">Нажмите <strong style="color: #fbbf24;">...</strong> (три точки)</div>
+                    <div style="font-size: 16px; color: rgba(248, 250, 252, 0.9);">Нажмите на <strong style="color: #fbbf24;">...</strong> (три точки)</div>
                   </div>
                   <div style="display: flex; align-items: center; gap: 15px; padding: 15px 20px; background: linear-gradient(135deg, rgba(124, 92, 255, 0.1), rgba(124, 92, 255, 0.05)); border: 1px solid rgba(124, 92, 255, 0.2); border-radius: 15px; text-align: left;">
                     <div style="width: 35px; height: 35px; background: linear-gradient(135deg, #7c5cff, #9d7fff); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 18px; color: white; flex-shrink: 0;">2</div>
-                    <div style="font-size: 16px; color: rgba(248, 250, 252, 0.9);">Выберите "Открыть в браузере"</div>
+                    <div style="font-size: 16px; color: rgba(248, 250, 252, 0.9);">Выберите «Открыть в браузере»</div>
                   </div>
                   <div style="display: flex; align-items: center; gap: 15px; padding: 15px 20px; background: linear-gradient(135deg, rgba(124, 92, 255, 0.1), rgba(124, 92, 255, 0.05)); border: 1px solid rgba(124, 92, 255, 0.2); border-radius: 15px; text-align: left;">
                     <div style="width: 35px; height: 35px; background: linear-gradient(135deg, #7c5cff, #9d7fff); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 18px; color: white; flex-shrink: 0;">3</div>
