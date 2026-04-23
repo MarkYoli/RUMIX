@@ -1,0 +1,1616 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Minecraft</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&family=Press+Start+2P&display=swap"
+    rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --neon-green: #00ff88;
+      --neon-purple: #b537f2;
+      --neon-gold: #ffd700;
+      --neon-blue: #00d4ff;
+      --bg-dark: #0a0e27;
+      --text-primary: #ffffff;
+      --text-secondary: rgba(255, 255, 255, 0.7);
+    }
+
+    body {
+      font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #0a0e27;
+      background-image:
+        radial-gradient(circle at 20% 30%, rgba(220, 38, 38, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 80% 70%, rgba(34, 197, 94, 0.12) 0%, transparent 50%),
+        radial-gradient(circle at 50% 50%, rgba(251, 191, 36, 0.1) 0%, transparent 60%);
+      min-height: 100vh;
+      color: var(--text-primary);
+      text-align: center;
+      padding: 0;
+      padding-top: 100px;
+      padding-bottom: 60px;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image:
+        repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.02) 0px, transparent 1px, transparent 2px, rgba(255, 255, 255, 0.02) 3px),
+        repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.02) 0px, transparent 1px, transparent 2px, rgba(255, 255, 255, 0.02) 3px);
+      background-size: 50px 50px;
+      pointer-events: none;
+      z-index: 1;
+      opacity: 0.3;
+    }
+
+    /* Loading Screen */
+    .geo-loading {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #0a0e27;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      transition: opacity 0.5s ease;
+    }
+
+    .geo-loading.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    /* Страховка: если JS не спрячет лоадер, CSS спрячет через 5сек */
+    .geo-loading {
+      animation: force-hide 0.5s ease 5s forwards;
+    }
+
+    @keyframes force-hide {
+      to {
+        opacity: 0;
+        pointer-events: none;
+      }
+    }
+
+    .loader {
+      width: 50px;
+      height: 50px;
+      border: 4px solid rgba(181, 55, 242, 0.3);
+      border-top-color: var(--neon-purple);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* Live Counter (вверху) */
+    .live-counter {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background: rgba(10, 14, 39, 0.98);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 10px 20px;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      font-size: 13px;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.9);
+      height: 42px;
+    }
+
+    .live-indicator {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .live-dot {
+      width: 8px;
+      height: 8px;
+      background: #ef4444;
+      border-radius: 50%;
+      animation: pulse-live 1.5s infinite;
+      box-shadow: 0 0 10px rgba(239, 68, 68, 0.8);
+    }
+
+    @keyframes pulse-live {
+
+      0%,
+      100% {
+        opacity: 1;
+        transform: scale(1);
+        box-shadow: 0 0 10px rgba(239, 68, 68, 0.8);
+      }
+
+      50% {
+        opacity: 0.7;
+        transform: scale(0.85);
+        box-shadow: 0 0 15px rgba(239, 68, 68, 1);
+      }
+    }
+
+    .live-count {
+      color: #fff;
+      font-weight: 700;
+    }
+
+    .live-separator {
+      width: 1px;
+      height: 16px;
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .winners-hour {
+      color: #22c55e;
+      font-weight: 700;
+    }
+
+    /* Bonus Alert (над кнопкой) */
+    /* Combined CTA Wrapper */
+    .cta-wrapper {
+      max-width: 400px;
+      margin: 20px auto;
+      background: linear-gradient(135deg, rgba(34, 197, 94, 0.15), rgba(34, 197, 94, 0.05));
+      border: 2px solid rgba(34, 197, 94, 0.4);
+      border-radius: 20px;
+      padding: 15px;
+      position: relative;
+    }
+
+    .bonus-header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding-bottom: 12px;
+      margin-bottom: 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .bonus-icon {
+      font-size: 24px;
+    }
+
+    .bonus-info {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .bonus-title {
+      font-size: 10px;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.7);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .bonus-amount {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 18px;
+      font-weight: 900;
+      color: #22c55e;
+      line-height: 1.1;
+      white-space: nowrap;
+    }
+
+    .bonus-timer {
+      display: flex;
+      align-items: center;
+      padding: 5px 10px;
+      background: rgba(239, 68, 68, 0.2);
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 700;
+      color: #ef4444;
+      font-family: 'Space Grotesk', monospace;
+    }
+
+    .cta-hint {
+      text-align: center;
+      margin-top: 10px;
+      font-size: 12px;
+      color: rgba(34, 197, 94, 0.8);
+      font-weight: 500;
+      animation: hint-pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes hint-pulse {
+
+      0%,
+      100% {
+        opacity: 0.6;
+      }
+
+      50% {
+        opacity: 1;
+      }
+    }
+
+    /* Winners Ticker */
+    .winners-ticker {
+      position: fixed;
+      top: 42px;
+      left: 0;
+      width: 100%;
+      background: rgba(10, 14, 39, 0.95);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(20px);
+      overflow: hidden;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      z-index: 998;
+    }
+
+    .winners-track {
+      display: flex;
+      gap: 30px;
+      animation: scroll-left 50s linear infinite;
+      will-change: transform;
+    }
+
+    @keyframes scroll-left {
+      0% {
+        transform: translateX(0);
+      }
+
+      100% {
+        transform: translateX(-50%);
+      }
+    }
+
+    .winner-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      background: rgba(255, 255, 255, 0.04);
+      border-radius: 6px;
+      white-space: nowrap;
+      font-size: 13px;
+      font-weight: 500;
+      color: rgba(255, 255, 255, 0.7);
+      transition: all 0.3s ease;
+    }
+
+    .winner-item:hover {
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .winner-dot {
+      width: 6px;
+      height: 6px;
+      background: #22c55e;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .winner-user {
+      color: rgba(255, 255, 255, 0.5);
+      font-weight: 500;
+    }
+
+    .winner-amount {
+      color: #22c55e;
+      font-weight: 700;
+      font-size: 13px;
+    }
+
+    .main-content {
+      padding: 0 20px 60px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 2;
+      padding: 0;
+    }
+
+    /* Hero Section */
+    .hero-section {
+      padding: 10px 10px;
+      position: relative;
+    }
+
+    /* Section Title */
+    .section-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      color: rgba(255, 255, 255, 0.6);
+      margin-bottom: 15px;
+      text-align: center;
+    }
+
+    .section-title span {
+      color: #fbbf24;
+    }
+
+    /* Games Grid */
+    .games-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 15px;
+    }
+
+    /* Game Card */
+    .game-card {
+      background: rgba(15, 18, 35, 0.9);
+      border-radius: 18px;
+      padding: 12px;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+      cursor: pointer;
+      text-decoration: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .game-card--mineslot {
+      border: 2px solid rgba(251, 191, 36, 0.4);
+      box-shadow: 0 0 25px rgba(251, 191, 36, 0.15), 0 8px 30px rgba(0, 0, 0, 0.4);
+    }
+
+    .game-card--mineslot:hover {
+      border-color: rgba(251, 191, 36, 0.8);
+      box-shadow: 0 0 40px rgba(251, 191, 36, 0.3), 0 12px 40px rgba(0, 0, 0, 0.5);
+      transform: translateY(-3px);
+    }
+
+    .game-card--rushhour {
+      border: 2px solid rgba(220, 38, 38, 0.4);
+      box-shadow: 0 0 25px rgba(220, 38, 38, 0.15), 0 8px 30px rgba(0, 0, 0, 0.4);
+    }
+
+    .game-card--rushhour:hover {
+      border-color: rgba(220, 38, 38, 0.8);
+      box-shadow: 0 0 40px rgba(220, 38, 38, 0.3), 0 12px 40px rgba(0, 0, 0, 0.5);
+      transform: translateY(-3px);
+    }
+
+    /* Game Card Preview */
+    .game-card__preview {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      border-radius: 12px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .game-card__preview img,
+    .game-card__preview video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 12px;
+    }
+
+    /* Game Card Name */
+    .game-card__name {
+      font-family: 'Press Start 2P', cursive;
+      font-size: 13px;
+      font-weight: 400;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      text-align: center;
+      line-height: 1.3;
+    }
+
+    .game-card--mineslot .game-card__name {
+      background: linear-gradient(180deg, #fff 0%, #ffd700 50%, #ffaa00 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .game-card--rushhour .game-card__name {
+      background: linear-gradient(180deg, #fff 0%, #ef4444 50%, #dc2626 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* Card CTA Button */
+    .game-card__cta {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      padding: 12px 10px;
+      border-radius: 12px;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 800;
+      color: white;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      border: none;
+      cursor: pointer;
+      font-family: 'Space Grotesk', sans-serif;
+    }
+
+    .game-card--mineslot .game-card__cta {
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+      box-shadow: 0 0 20px rgba(34, 197, 94, 0.5), inset 0 -3px 0 rgba(0, 0, 0, 0.15);
+    }
+
+    .game-card--rushhour .game-card__cta {
+      background: linear-gradient(135deg, #dc2626, #b91c1c);
+      box-shadow: 0 0 20px rgba(220, 38, 38, 0.5), inset 0 -3px 0 rgba(0, 0, 0, 0.15);
+    }
+
+    .game-card__cta:hover {
+      transform: scale(1.03);
+    }
+
+    .game-card__cta:active {
+      transform: scale(0.97);
+    }
+
+    .game-card__cta-icon {
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+    }
+
+    .game-card__cta .cta-shine {
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+      animation: shine 3s infinite;
+    }
+
+
+    @keyframes shine {
+      0% {
+        left: -100%;
+      }
+
+      50%,
+      100% {
+        left: 100%;
+      }
+    }
+
+    /* How to Play */
+    .how-to-play-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+      max-width: 300px;
+      margin: 20px auto 0;
+      padding: 12px 20px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.8);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .how-to-play-btn:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.25);
+    }
+
+    .how-to-play-btn.active {
+      border-color: rgba(34, 197, 94, 0.4);
+      background: rgba(34, 197, 94, 0.1);
+    }
+
+    .arrow-icon {
+      font-size: 12px;
+      transition: transform 0.3s ease;
+    }
+
+    .how-to-play-btn.active .arrow-icon {
+      transform: rotate(180deg);
+    }
+
+    .how-to-play-panel {
+      display: none;
+      max-width: 400px;
+      margin: 15px auto 0;
+      padding: 15px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+    }
+
+    .how-to-play-panel.open {
+      display: block;
+    }
+
+    .step {
+      display: flex;
+      align-items: flex-start;
+      gap: 15px;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .step:last-child {
+      border-bottom: none;
+    }
+
+    .step-num {
+      width: 28px;
+      height: 28px;
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 700;
+      color: white;
+      flex-shrink: 0;
+    }
+
+    .step-text {
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.8);
+      line-height: 1.5;
+      text-align: left;
+    }
+
+
+
+    @media (max-width: 480px) {
+      body {
+        padding-top: 85px;
+        padding-bottom: 40px;
+      }
+
+      .live-counter {
+        padding: 8px 12px;
+        font-size: 11px;
+        gap: 12px;
+        height: 38px;
+      }
+
+      .live-dot {
+        width: 6px;
+        height: 6px;
+      }
+
+      .winners-ticker {
+        top: 38px;
+        height: 40px;
+      }
+
+      .winner-item {
+        font-size: 11px;
+        padding: 5px 12px;
+        gap: 6px;
+      }
+
+      .hero-section {
+        padding: 10px 5px;
+      }
+
+      .section-title {
+        font-size: 14px;
+        letter-spacing: 2px;
+        margin-bottom: 10px;
+      }
+
+      .games-grid {
+        gap: 8px;
+      }
+
+      .game-card {
+        padding: 10px;
+        border-radius: 14px;
+        gap: 8px;
+      }
+
+      .game-card__name {
+        font-size: 11px;
+      }
+
+      .game-card__cta {
+        padding: 10px 8px;
+        font-size: 12px;
+        border-radius: 10px;
+        letter-spacing: 0.5px;
+      }
+
+      .game-card__cta-icon {
+        width: 14px;
+        height: 14px;
+      }
+
+      .game-card__preview {
+        border-radius: 10px;
+      }
+
+      .game-card__preview img,
+      .game-card__preview video {
+        border-radius: 10px;
+      }
+
+      .cta-wrapper {
+        margin: 10px 0;
+        padding: 10px;
+      }
+
+      .bonus-header {
+        gap: 8px;
+        padding-bottom: 8px;
+        margin-bottom: 8px;
+      }
+
+      .bonus-icon {
+        font-size: 18px;
+      }
+
+      .bonus-title {
+        font-size: 9px;
+      }
+
+      .bonus-amount {
+        font-size: 16px;
+      }
+
+      .bonus-timer {
+        font-size: 12px;
+        padding: 4px 8px;
+      }
+
+      .cta-hint {
+        font-size: 11px;
+        margin-top: 6px;
+      }
+
+      .how-to-play-btn {
+        max-width: 100%;
+        margin-top: 12px;
+      }
+
+      .how-to-play-panel {
+        margin: 10px 0 0;
+        padding: 12px;
+      }
+
+      .step-text {
+        font-size: 13px;
+      }
+    }
+
+    @media (max-width: 360px) {
+      .game-card__name {
+        font-size: 10px;
+      }
+
+      .game-card__cta {
+        font-size: 11px;
+        padding: 9px 6px;
+      }
+
+      .game-card {
+        padding: 8px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Loading Screen -->
+  <div class="geo-loading" id="geo-loading">
+    <div class="loader"></div>
+  </div>
+
+  <!-- Live Counter -->
+  <div class="live-counter">
+    <div class="live-indicator">
+      <span class="live-dot"></span>
+      <span class="live-count" id="live-count">2,847</span> <span id="live-text">играют сейчас</span>
+    </div>
+    <span class="live-separator"></span>
+    <div>
+      <span class="winners-hour" id="winners-count">+124</span> <span id="winners-text">выиграли за час</span>
+    </div>
+  </div>
+
+  <!-- Winners Ticker -->
+  <div class="winners-ticker">
+    <div class="winners-track" id="winners-track">
+      <!-- Будет заполнено через JavaScript -->
+    </div>
+  </div>
+
+
+    <div class="container">
+      <!-- Hero Section -->
+      <div class="hero-section">
+
+        <div class="section-title" id="section-title"><span>▸</span> ВЫБЕРИ ИГРУ</div>
+
+        <!-- Games Grid -->
+        <div class="games-grid">
+          <!-- Mineslot Card -->
+          <div class="game-card game-card--mineslot">
+            <div class="game-card__preview">
+              <img src="image/usd.gif" alt="Mineslot" id="gameplay-gif">
+            </div>
+            <div class="game-card__name">MINESLOT</div>
+            <a href="https://jetton.tips/chpIiowwgc9?click_id=%7Bclick_id%7D" id="cta-link" target="_blank" class="game-card__cta">
+              <svg class="game-card__cta-icon" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M8 5v14l11-7z" />
+              </svg>
+              <span id="cta-text">ИГРАТЬ</span>
+              <span class="cta-shine"></span>
+            </a>
+          </div>
+
+          <!-- Doodle Jump Card -->
+          <div class="game-card game-card--rushhour">
+            <div class="game-card__preview">
+              <img src="image/jumper.png" alt="Doodle Jump" id="rushhour-video">
+            </div>
+            <div class="game-card__name">DOODLE JUMP</div>
+            <a href="https://jetton.tips/chpIiowwgc9?click_id=%7Bclick_id%7D" id="cta-link-rh" target="_blank" class="game-card__cta">
+              <svg class="game-card__cta-icon" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M8 5v14l11-7z" />
+              </svg>
+              <span id="cta-text-rh">ИГРАТЬ</span>
+              <span class="cta-shine"></span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Shared Bonus Block -->
+        <div class="cta-wrapper">
+          <div class="bonus-header">
+            <div class="bonus-icon">🎁</div>
+            <div class="bonus-info">
+              <div class="bonus-title" id="bonus-title">СПЕЦИАЛЬНЫЙ БОНУС</div>
+              <div class="bonus-amount">
+                <span id="bonus-amount">50</span> <span id="bonus-currency">USD</span>
+              </div>
+            </div>
+            <div class="bonus-timer">
+              <span id="timer">05:00</span>
+            </div>
+          </div>
+          <div class="cta-hint" id="cta-hint">↑ Выбери игру и получи свой бонус ↑</div>
+        </div>
+
+        <!-- How to Play Button -->
+        <button class="how-to-play-btn" id="how-to-play-btn">
+          <span id="how-to-play-text">Как играть?</span>
+          <span class="arrow-icon">▼</span>
+        </button>
+
+        <!-- How to Play Panel -->
+        <div class="how-to-play-panel" id="how-to-play-panel">
+          <div class="step">
+            <div class="step-num">1</div>
+            <div class="step-text" id="step-1">Зарегистрируйся, нажав кнопку "Играть"</div>
+          </div>
+          <div class="step">
+            <div class="step-num">2</div>
+            <div class="step-text" id="step-2">Пополни счёт на любую сумму</div>
+          </div>
+          <div class="step">
+            <div class="step-num">3</div>
+            <div class="step-text" id="step-3">Найди "Mine Slot" или "Doodle Jump" в казино</div>
+          </div>
+          <div class="step">
+            <div class="step-num">4</div>
+            <div class="step-text" id="step-4">Начинай выигрывать!</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    // Конфигурация стран LATAM
+    const COUNTRIES_CONFIG = {
+      MX: { // Мексика
+        name: 'México',
+        currency: 'MXN',
+        currencySymbol: '$',
+        flag: '🇲🇽',
+        locale: 'es-MX',
+        offer: 'https://jetton.tips/chpIiowwgc9?click_id=%7Bclick_id%7D',
+        defaultLink: 'https://jetton.tips/chpIiowwgc9?click_id=%7Bclick_id%7D',
+        gif: 'image/mxn.gif',
+        prizes: { min: 2000, max: 50000, bonus: 1000 },
+        text: {
+          cta: 'ИГРАТЬ',
+          bonusTitle: 'СПЕЦИАЛЬНЫЙ БОНУС',
+          liveText: 'играют сейчас',
+          winnersText: 'выиграли за час',
+          howToPlay: 'Как играть?',
+          step1: 'Зарегистрируйся, нажав кнопку "Играть"',
+          step2: 'Пополни счёт на любую сумму',
+          step3: 'Найди "Mine Slot" или "Doodle Jump" в казино',
+          step4: 'Начинай выигрывать!',
+          ctaHint: '↑ Выбери игру и получи свой бонус ↑'
+        }
+      },
+      AR: { // Аргентина
+        name: 'Argentina',
+        currency: 'ARS',
+        currencySymbol: '$',
+        flag: '🇦🇷',
+        locale: 'es-AR',
+        offer: 'https://jetton.tips/chpIiowwgc9?click_id=%7Bclick_id%7D',
+        defaultLink: 'https://jetton.tips/chpIiowwgc9?click_id=%7Bclick_id%7D',
+        gif: 'image/ars.gif',
+        prizes: { min: 50000, max: 2000000, bonus: 25000 },
+        text: {
+          cta: 'ИГРАТЬ',
+          bonusTitle: 'СПЕЦИАЛЬНЫЙ БОНУС',
+          liveText: 'играют сейчас',
+          winnersText: 'выиграли за час',
+          howToPlay: 'Как играть?',
+          step1: 'Зарегистрируйся, нажав кнопку "Играть"',
+          step2: 'Пополни счёт на любую сумму',
+          step3: 'Найди "Mine Slot" или "Doodle Jump" в казино',
+          step4: 'Начинай выигрывать!',
+          ctaHint: '↑ Выбери игру и получи свой бонус ↑'
+        }
+      },
+      CO: { // Колумбия
+        name: 'Colombia',
+        currency: 'COP',
+        currencySymbol: '$',
+        flag: '🇨🇴',
+        locale: 'es-CO',
+        offer: 'https://jetton.tips/chpIiowwgc9?click_id=%7Bclick_id%7D',
+        defaultLink: 'https://jetton.tips/chpIiowwgc9?click_id=%7Bclick_id%7D',
+        gif: 'image/cop.gif',
+        prizes: { min: 50000, max: 5000000, bonus: 200000 },
+        text: {
+          cta: 'ИГРАТЬ',
+          bonusTitle: 'СПЕЦИАЛЬНЫЙ БОНУС',
+          liveText: 'играют сейчас',
+          winnersText: 'выиграли за час',
+          howToPlay: 'Как играть?',
+          step1: 'Зарегистрируйся, нажав кнопку "Играть"',
+          step2: 'Пополни счёт на любую сумму',
+          step3: 'Найди "Mine Slot" или "Doodle Jump" в казино',
+          step4: 'Начинай выигрывать!',
+          ctaHint: '↑ Выбери игру и получи свой бонус ↑'
+        }
+      },
+      CL: { // Чили
+        name: 'Chile',
+        currency: 'CLP',
+        currencySymbol: '$',
+        flag: '🇨🇱',
+        locale: 'es-CL',
+        offer: 'https://jetton.tips/chpIiowwgc9?click_id=%7Bclick_id%7D',
+        defaultLink: 'https://jetton.tips/chpIiowwgc9?click_id=%7Bclick_id%7D',
+        gif: 'image/clp.gif',
+        prizes: { min: 10000, max: 10000000, bonus: 50000 },
+        text: {
+          cta: 'ИГРАТЬ',
+          bonusTitle: 'СПЕЦИАЛЬНЫЙ БОНУС',
+          liveText: 'играют сейчас',
+          winnersText: 'выиграли за час',
+          howToPlay: 'Как играть?',
+          step1: 'Зарегистрируйся, нажав кнопку "Играть"',
+          step2: 'Пополни счёт на любую сумму',
+          step3: 'Найди "Mine Slot" или "Doodle Jump" в казино',
+          step4: 'Начинай выигрывать!',
+          ctaHint: '↑ Выбери игру и получи свой бонус ↑'
+        }
+      },
+      PE: { // Перу
+        name: 'Perú',
+        currency: 'PEN',
+        currencySymbol: 'S/',
+        flag: '🇵🇪',
+        locale: 'es-PE',
+        offer: 'https://jetton.tips/chpIiowwgc9?click_id=%7Bclick_id%7D',
+        defaultLink: 'https://jetton.tips/chpIiowwgc9?click_id=%7Bclick_id%7D',
+        gif: 'image/pen.gif',
+        prizes: { min: 100, max: 50000, bonus: 200 },
+        text: {
+          cta: 'ИГРАТЬ',
+          bonusTitle: 'СПЕЦИАЛЬНЫЙ БОНУС',
+          liveText: 'играют сейчас',
+          winnersText: 'выиграли за час',
+          howToPlay: 'Как играть?',
+          step1: 'Зарегистрируйся, нажав кнопку "Играть"',
+          step2: 'Пополни счёт на любую сумму',
+          step3: 'Найди "Mine Slot" или "Doodle Jump" в казино',
+          step4: 'Начинай выигрывать!',
+          ctaHint: '↑ Выбери игру и получи свой бонус ↑'
+        }
+      },
+      BR: { // Бразилия
+        name: 'Brasil',
+        currency: 'BRL',
+        currencySymbol: 'R$',
+        flag: '🇧🇷',
+        locale: 'pt-BR',
+        offer: 'https://jetton.tips/chpIiowwgc9?click_id=%7Bclick_id%7D',
+        defaultLink: 'https://jetton.tips/chpIiowwgc9?click_id=%7Bclick_id%7D',
+        gif: 'image/brl.gif',
+        prizes: { min: 100, max: 50000, bonus: 250 },
+        text: {
+          cta: 'ИГРАТЬ',
+          bonusTitle: 'СПЕЦИАЛЬНЫЙ БОНУС',
+          liveText: 'играют сейчас',
+          winnersText: 'выиграли за час',
+          howToPlay: 'Как играть?',
+          step1: 'Зарегистрируйся, нажав кнопку "Играть"',
+          step2: 'Пополни счёт на любую сумму',
+          step3: 'Найди "Mine Slot" или "Doodle Jump" в казино',
+          step4: 'Начинай выигрывать!',
+          ctaHint: '↑ Выбери игру и получи свой бонус ↑'
+        }
+      },
+      VE: { // Венесуэла
+        name: 'Venezuela',
+        currency: 'USD',
+        currencySymbol: '$',
+        flag: '🇻🇪',
+        locale: 'es-VE',
+        offer: 'https://jetton.tips/chpIiowwgc9?click_id=%7Bclick_id%7D',
+        defaultLink: 'https://jetton.tips/chpIiowwgc9?click_id=%7Bclick_id%7D',
+        gif: 'image/usd.gif',
+        prizes: { min: 10, max: 1000, bonus: 50 },
+        text: {
+          cta: 'ИГРАТЬ',
+          bonusTitle: 'СПЕЦИАЛЬНЫЙ БОНУС',
+          liveText: 'играют сейчас',
+          winnersText: 'выиграли за час',
+          howToPlay: 'Как играть?',
+          step1: 'Зарегистрируйся, нажав кнопку "Играть"',
+          step2: 'Пополни счёт на любую сумму',
+          step3: 'Найди "Mine Slot" или "Doodle Jump" в казино',
+          step4: 'Начинай выигрывать!',
+          ctaHint: '↑ Выбери игру и получи свой бонус ↑'
+        }
+      },
+      EC: { // Эквадор
+        name: 'Ecuador',
+        currency: 'USD',
+        currencySymbol: '$',
+        flag: '🇪🇨',
+        locale: 'es-EC',
+        offer: 'https://jetton.tips/chpIiowwgc9?click_id=%7Bclick_id%7D',
+        defaultLink: 'https://jetton.tips/chpIiowwgc9?click_id=%7Bclick_id%7D',
+        gif: 'image/usd.gif',
+        prizes: { min: 10, max: 1000, bonus: 50 },
+        text: {
+          cta: 'ИГРАТЬ',
+          bonusTitle: 'СПЕЦИАЛЬНЫЙ БОНУС',
+          liveText: 'играют сейчас',
+          winnersText: 'выиграли за час',
+          howToPlay: 'Как играть?',
+          step1: 'Зарегистрируйся, нажав кнопку "Играть"',
+          step2: 'Пополни счёт на любую сумму',
+          step3: 'Найди "Mine Slot" или "Doodle Jump" в казино',
+          step4: 'Начинай выигрывать!',
+          ctaHint: '↑ Выбери игру и получи свой бонус ↑'
+        }
+      },
+      ES: { // Испания
+        name: 'España',
+        currency: 'EUR',
+        currencySymbol: '€',
+        flag: '🇪🇸',
+        locale: 'es-ES',
+        offer: 'https://jetton.tips/chpIiowwgc9?click_id=%7Bclick_id%7D',
+        defaultLink: 'https://jetton.tips/chpIiowwgc9?click_id=%7Bclick_id%7D',
+        gif: 'image/es.gif',
+        prizes: { min: 10, max: 1000, bonus: 50 },
+        text: {
+          cta: 'ИГРАТЬ',
+          bonusTitle: 'СПЕЦИАЛЬНЫЙ БОНУС',
+          liveText: 'играют сейчас',
+          winnersText: 'выиграли за час',
+          howToPlay: 'Как играть?',
+          step1: 'Зарегистрируйся, нажав кнопку "Играть"',
+          step2: 'Пополни счёт на любую сумму',
+          step3: 'Найди "Mine Slot" или "Doodle Jump" в казино',
+          step4: 'Начинай выигрывать!',
+          ctaHint: '↑ Выбери игру и получи свой бонус ↑'
+        }
+      },
+      DEFAULT: { // Fallback
+        name: 'LATAM',
+        currency: 'USD',
+        currencySymbol: '$',
+        flag: '🌎',
+        locale: 'es',
+        offer: 'https://jetton.tips/chpIiowwgc9?click_id=%7Bclick_id%7D',
+        defaultLink: 'https://jetton.tips/chpIiowwgc9?click_id=%7Bclick_id%7D',
+        gif: 'image/usd.gif',
+        prizes: { min: 10, max: 1000, bonus: 50 },
+        text: {
+          cta: 'ИГРАТЬ',
+          bonusTitle: 'СПЕЦИАЛЬНЫЙ БОНУС',
+          liveText: 'играют сейчас',
+          winnersText: 'выиграли за час',
+          howToPlay: 'Как играть?',
+          step1: 'Зарегистрируйся, нажав кнопку "Играть"',
+          step2: 'Пополни счёт на любую сумму',
+          step3: 'Найди "Mine Slot" или "Doodle Jump" в казино',
+          step4: 'Начинай выигрывать!',
+          ctaHint: '↑ Выбери игру и получи свой бонус ↑'
+        }
+      }
+    };
+
+    let userCountry = null;
+
+    // === CONFIG & STATS (Vercel) ===
+    let offersConfig = null;
+
+    // Offer groups mapping (все страны должны быть здесь!)
+    const OFFER_GROUPS = {
+      // Mineslot оффер 1: Мексика
+      'MX': 1,
+      // Mineslot оффер 2: Перу
+      'PE': 2,
+      // Mineslot оффер 3: Весь мир (AR, CO, CL, BR, EC, ES, VE и все остальные)
+      'DEFAULT': 3
+    };
+
+    // Load offers config from API (KV) с таймаутом + localStorage-кеш
+    async function loadOffersConfig() {
+      try {
+        const ctrl = new AbortController();
+        setTimeout(() => ctrl.abort(), 3000); // 3сек таймаут
+        const response = await fetch('/api/offers', { signal: ctrl.signal });
+        const data = await response.json();
+        if (data.offers) {
+          // Сохраняем в кеш
+          try { localStorage.setItem('offers_cache', JSON.stringify(data.offers)); } catch (x) { }
+          offersConfig = data.offers;
+        }
+      } catch (e) {
+        console.error('Failed to load offers, using cache:', e);
+        // Берём из кеша
+        try {
+          const cached = JSON.parse(localStorage.getItem('offers_cache'));
+          offersConfig = cached || null;
+        } catch (x) {
+          offersConfig = null;
+        }
+      }
+    }
+
+    // Get Mineslot offer settings
+    function getOfferSettings(countryCode) {
+      if (!offersConfig) {
+        console.log('offersConfig not loaded, using defaults');
+        return null;
+      }
+      const normalizedCode = countryCode ? countryCode.toUpperCase() : 'DEFAULT';
+      const offerNum = OFFER_GROUPS[normalizedCode] || 3;
+      console.log('Getting Mineslot offer for', normalizedCode, '-> offer', offerNum);
+      return offersConfig[offerNum] || null;
+    }
+
+    // Get Rush Hour link (PE gets separate offer, rest gets global)
+    function getRushHourLink(countryCode) {
+      if (!offersConfig) return null;
+      var code = countryCode ? countryCode.toUpperCase() : '';
+      // PE → отдельный оффер rh-pe
+      if (code === 'PE' && offersConfig['rh-pe']) {
+        var peLink = offersConfig['rh-pe'].link;
+        if (peLink && peLink.trim() !== '') return peLink.trim();
+      }
+      // Все остальные → глобальный rh
+      if (offersConfig['rh']) {
+        var link = offersConfig['rh'].link;
+        if (link && link.trim() !== '') return link.trim();
+      }
+      return null;
+    }
+
+    // Track stats via API
+    function trackStat(type) {
+      // Fire and forget - не ждём ответа
+      fetch('/api/stats', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type })
+      }).catch(e => console.error('Stats error:', e));
+    }
+
+    // Track CTA click (используем sendBeacon чтобы успеть отправить перед переходом)
+    function trackClick() {
+      // sendBeacon гарантированно отправит данные даже при уходе со страницы
+      if (navigator.sendBeacon) {
+        const blob = new Blob([JSON.stringify({ type: 'click' })], { type: 'application/json' });
+        navigator.sendBeacon('/api/stats', blob);
+      } else {
+        trackStat('click');
+      }
+    }
+
+    // Track geo visit (по стране IP) — вызывается при заходе на страницу
+    let GEO_COUNTRY = 'XX'; // код страны по IP
+    function trackGeoVisit() {
+      var type = 'click:' + GEO_COUNTRY;
+      fetch('/api/stats', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: type })
+      }).catch(function () { });
+    }
+
+    // === END CONFIG & STATS ===
+
+    // Кэш в localStorage (24 часа)
+    const GEO_CACHE_KEY = 'user_country_cache';
+    const GEO_CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 часа
+
+    function getCachedCountry() {
+      try {
+        const cached = localStorage.getItem(GEO_CACHE_KEY);
+        if (cached) {
+          const { country, timestamp } = JSON.parse(cached);
+          if (Date.now() - timestamp < GEO_CACHE_DURATION) {
+            console.log('Using cached country:', country);
+            return country;
+          }
+        }
+      } catch (e) {
+        console.error('Cache read error:', e);
+      }
+      return null;
+    }
+
+    function setCachedCountry(country) {
+      try {
+        localStorage.setItem(GEO_CACHE_KEY, JSON.stringify({
+          country,
+          timestamp: Date.now()
+        }));
+      } catch (e) {
+        console.error('Cache write error:', e);
+      }
+    }
+
+    // Определение по timezone (быстрый fallback)
+    function guessCountryByTimezone() {
+      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      const timezoneMap = {
+        'America/Mexico_City': 'MX',
+        'America/Cancun': 'MX',
+        'America/Monterrey': 'MX',
+        'America/Buenos_Aires': 'AR',
+        'America/Argentina/Buenos_Aires': 'AR',
+        'America/Bogota': 'CO',
+        'America/Santiago': 'CL',
+        'America/Lima': 'PE',
+        'America/Sao_Paulo': 'BR',
+        'America/Caracas': 'VE',
+        'America/Guayaquil': 'EC',
+        'Europe/Madrid': 'ES'
+      };
+
+      const country = timezoneMap[timezone];
+      if (country) {
+        console.log('Guessed country by timezone:', country, timezone);
+        return country;
+      }
+      return null;
+    }
+
+    // Проверка URL параметра (для тестирования)
+    function getCountryFromURL() {
+      const params = new URLSearchParams(window.location.search);
+      const country = params.get('country');
+      if (country && COUNTRIES_CONFIG[country.toUpperCase()]) {
+        console.log('Using country from URL:', country.toUpperCase());
+        return country.toUpperCase();
+      }
+      return null;
+    }
+
+    // Основная функция определения GEO (серверный API + fallbacks)
+    async function detectGeo() {
+      // 0. Проверяем URL параметр (для тестирования: ?country=MX или ?clearcache=1)
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('clearcache')) {
+        localStorage.removeItem(GEO_CACHE_KEY);
+        console.log('Cache cleared');
+      }
+
+      let country = getCountryFromURL();
+      if (country) { GEO_COUNTRY = country; return country; }
+
+      // 1. Проверяем кэш (мгновенно - 0ms)
+      country = getCachedCountry();
+      if (country) { GEO_COUNTRY = country; return country; }
+
+      // 2. Серверный API (Vercel → x-vercel-ip-country, быстро ~50ms)
+      try {
+        const ctrl = new AbortController();
+        setTimeout(() => ctrl.abort(), 3000); // 3сек таймаут
+        const response = await fetch('/api/geo', { signal: ctrl.signal });
+        const data = await response.json();
+        if (data.country) {
+          console.log('Detected country via server API:', data.country);
+          GEO_COUNTRY = data.country;
+          setCachedCountry(data.country);
+          return data.country;
+        }
+      } catch (e) {
+        console.error('Geo API failed:', e);
+      }
+
+      // 3. Timezone как последний fallback
+      country = guessCountryByTimezone();
+      if (country) {
+        GEO_COUNTRY = country;
+        setCachedCountry(country);
+        return country;
+      }
+
+      // 4. Fallback на DEFAULT
+      console.log('Using DEFAULT country');
+      return null;
+    }
+
+    // Функция применения конфига страны
+    function applyCountryConfig(countryCode) {
+      // Нормализуем код страны (всегда uppercase)
+      const normalizedCode = countryCode ? countryCode.toUpperCase() : 'DEFAULT';
+
+      // Проверяем есть ли страна в конфиге
+      const hasConfig = COUNTRIES_CONFIG[normalizedCode];
+      const config = hasConfig || COUNTRIES_CONFIG.DEFAULT;
+      userCountry = config;
+
+      // Debug logging
+      console.log('=== GEO DEBUG ===');
+      console.log('Country code:', normalizedCode);
+      console.log('Has config:', !!hasConfig);
+      console.log('Using config for:', hasConfig ? normalizedCode : 'DEFAULT');
+      console.log('Offer group:', OFFER_GROUPS[normalizedCode] || 3);
+
+      // Получаем настройки оффера из админки
+      const offerSettings = getOfferSettings(normalizedCode);
+      console.log('Offer settings from admin:', offerSettings);
+
+      // Обновляем текст
+      document.getElementById('cta-text').textContent = config.text.cta;
+      document.getElementById('cta-text-rh').textContent = config.text.cta;
+      document.getElementById('bonus-title').textContent = config.text.bonusTitle;
+      document.getElementById('live-text').textContent = config.text.liveText;
+      document.getElementById('winners-text').textContent = config.text.winnersText;
+      document.getElementById('how-to-play-text').textContent = config.text.howToPlay;
+      document.getElementById('step-1').textContent = config.text.step1;
+      document.getElementById('step-2').textContent = config.text.step2;
+      document.getElementById('step-3').textContent = config.text.step3;
+      document.getElementById('step-4').textContent = config.text.step4;
+      document.getElementById('cta-hint').textContent = config.text.ctaHint;
+      if (config.text.sectionTitle) {
+        document.getElementById('section-title').innerHTML = '<span>▸</span> ' + config.text.sectionTitle;
+      }
+
+      // Бонус: используем из админки если задан, иначе дефолт
+      const bonusEl = document.getElementById('bonus-amount');
+      const currencyEl = document.getElementById('bonus-currency');
+
+      if (offerSettings && offerSettings.bonus) {
+        // Бонус из админки (до 20 символов, показываем как есть)
+        bonusEl.textContent = offerSettings.bonus;
+        currencyEl.textContent = ''; // Валюта уже в тексте бонуса
+      } else {
+        // Дефолтный бонус
+        bonusEl.textContent = formatNumber(config.prizes.bonus, config.locale);
+        currencyEl.textContent = config.currency;
+      }
+
+      // Обновляем гифку
+      document.getElementById('gameplay-gif').src = config.gif;
+
+      // Ссылка Mineslot: приоритет API оффер → дефолт из конфига
+      const ctaLink = document.getElementById('cta-link');
+      if (offerSettings && offerSettings.link && offerSettings.link.trim() !== '') {
+        ctaLink.href = offerSettings.link.trim();
+      } else {
+        ctaLink.href = config.defaultLink || config.offer;
+      }
+
+      // Ссылка Rush Hour: отдельный оффер 'rh' / 'rh-pe'
+      const ctaLinkRh = document.getElementById('cta-link-rh');
+      if (ctaLinkRh) {
+        var rhLink = getRushHourLink(normalizedCode);
+        if (rhLink) {
+          ctaLinkRh.href = rhLink;
+        } else {
+          // Фоллбек: хардкод дефолты (не копируем Mineslot — это другой оффер)
+          ctaLinkRh.href = normalizedCode === 'PE'
+            ? 'https://jetton.tips/chpIiowwgc9?click_id=%7Bclick_id%7D'
+            : 'https://jetton.tips/chpIiowwgc9?click_id=%7Bclick_id%7D';
+        }
+      }
+
+
+      // Меняем язык страницы
+      document.documentElement.lang = config.locale.split('-')[0];
+
+      // Генерируем выигрыши для бегущей строки
+      generateWinners(config);
+    }
+
+    // Форматирование чисел
+    function formatNumber(num, locale) {
+      return new Intl.NumberFormat(locale, {
+        maximumFractionDigits: 0
+      }).format(num);
+    }
+
+    // Генерация выигрышей для бегущей строки
+    function generateWinners(config) {
+      const track = document.getElementById('winners-track');
+      if (!track) {
+        console.error('winners-track element not found!');
+        return;
+      }
+
+      if (!config || !config.prizes) {
+        console.error('Invalid config for generateWinners:', config);
+        return;
+      }
+
+      const winners = [];
+
+      // Генерируем 30 случайных выигрышей
+      for (let i = 0; i < 30; i++) {
+        const randomAmount = Math.floor(
+          Math.random() * (config.prizes.max - config.prizes.min) + config.prizes.min
+        );
+        winners.push({
+          user: `${Math.floor(100 + Math.random() * 900)}***`,
+          amount: randomAmount,
+          flag: config.flag
+        });
+      }
+
+      const winnerHTML = winners.map(winner => {
+        const formattedAmount = formatNumber(winner.amount, config.locale);
+        return `
+          <div class="winner-item">
+            <span class="winner-dot"></span>
+            <span class="winner-user">ID: ${winner.user}</span>
+            <span class="winner-amount">+${config.currencySymbol}${formattedAmount}</span>
+          </div>
+        `;
+      }).join('');
+
+      // Дублируем для бесшовной анимации
+      track.innerHTML = winnerHTML + winnerHTML;
+
+      // Перезапускаем анимацию (сброс и запуск заново)
+      track.style.animation = 'none';
+      track.offsetHeight; // Trigger reflow
+      track.style.animation = 'scroll-left 50s linear infinite';
+    }
+
+    // Таймер обратного отсчета
+    function startTimer() {
+      let timeLeft = 5 * 60; // 5 минут в секундах
+      const timerElement = document.getElementById('timer');
+
+      function updateTimer() {
+        const minutes = Math.floor(timeLeft / 60);
+        const seconds = timeLeft % 60;
+        timerElement.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+
+        if (timeLeft <= 0) {
+          timeLeft = 5 * 60; // Сброс на 5 минут
+        } else {
+          timeLeft--;
+        }
+      }
+
+      updateTimer();
+      setInterval(updateTimer, 1000);
+    }
+
+    // Анимация live counter
+    function animateLiveCounter() {
+      const liveCount = document.getElementById('live-count');
+      const winnersCount = document.getElementById('winners-count');
+
+      setInterval(() => {
+        // Изменяем количество игроков (2500-3500)
+        const currentPlayers = parseInt(liveCount.textContent.replace(/[,\.]/g, ''));
+        const change = Math.floor(Math.random() * 30) - 15; // -15 до +15
+        const newPlayers = Math.max(2500, Math.min(3500, currentPlayers + change));
+        liveCount.textContent = new Intl.NumberFormat('es').format(newPlayers);
+      }, 3000);
+
+      setInterval(() => {
+        // Изменяем количество победителей (100-200)
+        const currentWinners = parseInt(winnersCount.textContent.replace(/[+,\.]/g, ''));
+        const change = Math.floor(Math.random() * 10) - 5; // -5 до +5
+        const newWinners = Math.max(100, Math.min(200, currentWinners + change));
+        winnersCount.textContent = '+' + newWinners;
+      }, 5000);
+    }
+
+    // Детектор TikTok браузера
+    function isTikTokBrowser() {
+      const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+      return /TikTok/i.test(userAgent) || /musical_ly/i.test(userAgent) || /BytedanceWebview/i.test(userAgent);
+    }
+
+
+
+    // Инициализация при загрузке
+    window.addEventListener('DOMContentLoaded', async () => {
+      try {
+        // 1. Определяем гео (с таймаутом)
+        let countryCode = null;
+        try {
+          countryCode = await detectGeo();
+        } catch (e) {
+          console.error('detectGeo crashed:', e);
+        }
+
+        // 2. TikTok-детект
+        if (isTikTokBrowser()) {
+          try { trackStat('tiktok'); } catch (e) { }
+          try { trackGeoVisit(); } catch (e) { }
+
+          // Показываем предупреждение для TikTok
+          document.body.innerHTML = `
+            <style>
+              @keyframes bounce-arrow {
+                0%, 100% { transform: translateY(0); }
+                50% { transform: translateY(-8px); }
+              }
+              @keyframes pulse-glow {
+                0%, 100% { filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.8)); }
+                50% { filter: drop-shadow(0 0 20px rgba(251, 191, 36, 1)); }
+              }
+              .arrow-pointer {
+                position: fixed;
+                top: 12px;
+                right: 5px;
+                z-index: 9999;
+                animation: bounce-arrow 0.8s ease-in-out infinite, pulse-glow 1.5s ease-in-out infinite;
+              }
+            </style>
+            <div class="arrow-pointer">
+              <svg width="40" height="50" viewBox="0 0 40 50" fill="none">
+                <path d="M20 45L20 10M20 10L8 22M20 10L32 22" stroke="#fbbf24" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="tiktok-warning-container" style="min-height: 100vh; display: flex; align-items: flex-start; justify-content: center; padding: 15px 20px 20px 20px; background: linear-gradient(140deg, #0b1018 0%, #151d2d 50%, #101726 100%);">
+              <div class="tiktok-warning-card" style="max-width: 500px; width: 100%; padding: 40px 30px; background: rgba(17, 24, 39, 0.9); border: 1px solid rgba(148, 163, 184, 0.2); border-radius: 28px; box-shadow: 0 24px 44px rgba(8, 11, 20, 0.6); backdrop-filter: blur(22px); text-align: center;">
+                <div class="warning-icon" style="font-size: 64px; margin-bottom: 20px; animation: pulse 2s infinite;">⚠️</div>
+                <h1 style="font-family: 'Space Grotesk', sans-serif; font-size: 28px; font-weight: 700; color: #f8fafc; margin-bottom: 20px;">Открыть в браузере</h1>
+                <p style="font-size: 18px; color: rgba(248, 250, 252, 0.8); line-height: 1.6; margin-bottom: 30px;">
+                  Чтобы открыть игру, нажмите на <strong>3 точки</strong> в правом верхнем углу и выберите <strong>"Открыть в браузере"</strong>
+                </p>
+                <div style="display: flex; flex-direction: column; gap: 15px; margin-top: 30px;">
+                  <div style="display: flex; align-items: center; gap: 15px; padding: 15px 20px; background: linear-gradient(135deg, rgba(124, 92, 255, 0.1), rgba(124, 92, 255, 0.05)); border: 1px solid rgba(124, 92, 255, 0.2); border-radius: 15px; text-align: left;">
+                    <div style="width: 35px; height: 35px; background: linear-gradient(135deg, #7c5cff, #9d7fff); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 18px; color: white; flex-shrink: 0;">1</div>
+                    <div style="font-size: 16px; color: rgba(248, 250, 252, 0.9);">Нажмите <strong style="color: #fbbf24;">...</strong> (три точки)</div>
+                  </div>
+                  <div style="display: flex; align-items: center; gap: 15px; padding: 15px 20px; background: linear-gradient(135deg, rgba(124, 92, 255, 0.1), rgba(124, 92, 255, 0.05)); border: 1px solid rgba(124, 92, 255, 0.2); border-radius: 15px; text-align: left;">
+                    <div style="width: 35px; height: 35px; background: linear-gradient(135deg, #7c5cff, #9d7fff); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 18px; color: white; flex-shrink: 0;">2</div>
+                    <div style="font-size: 16px; color: rgba(248, 250, 252, 0.9);">Выберите "Открыть в браузере"</div>
+                  </div>
+                  <div style="display: flex; align-items: center; gap: 15px; padding: 15px 20px; background: linear-gradient(135deg, rgba(124, 92, 255, 0.1), rgba(124, 92, 255, 0.05)); border: 1px solid rgba(124, 92, 255, 0.2); border-radius: 15px; text-align: left;">
+                    <div style="width: 35px; height: 35px; background: linear-gradient(135deg, #7c5cff, #9d7fff); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 18px; color: white; flex-shrink: 0;">3</div>
+                    <div style="font-size: 16px; color: rgba(248, 250, 252, 0.9);">Наслаждайтесь игрой!</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+          return;
+        }
+
+        // 3. Трекинг (fire-and-forget, не блокирует)
+        try { trackStat('landing'); } catch (e) { }
+        try { trackGeoVisit(); } catch (e) { }
+
+        // 4. Загрузка оффера
+        try {
+          await loadOffersConfig();
+        } catch (e) {
+          console.error('loadOffersConfig failed:', e);
+        }
+
+        // 5. Применяем конфиг ВСЕГДА
+        try {
+          applyCountryConfig(countryCode || 'DEFAULT');
+        } catch (e) {
+          console.error('applyCountryConfig failed:', e);
+        }
+
+        // 6. Запускаем таймер и live counter
+        try { startTimer(); } catch (e) { }
+        try { animateLiveCounter(); } catch (e) { }
+
+        // 7. How to Play toggle
+        try {
+          document.getElementById('how-to-play-btn').addEventListener('click', function () {
+            const panel = document.getElementById('how-to-play-panel');
+            this.classList.toggle('active');
+            panel.classList.toggle('open');
+          });
+        } catch (e) { }
+
+        // 8. Track CTA clicks
+        try {
+          document.getElementById('cta-link').addEventListener('click', trackClick);
+          var ctaLinkRh = document.getElementById('cta-link-rh');
+          if (ctaLinkRh) ctaLinkRh.addEventListener('click', trackClick);
+        } catch (e) { }
+
+      } finally {
+        // ГАРАНТИРОВАННО скрываем лоадер — даже если ВСЁ упало
+        setTimeout(function () {
+          var loader = document.getElementById('geo-loading');
+          if (loader) loader.classList.add('hidden');
+        }, 300);
+      }
+    });
+  </script>
+</body>
+
+</html>
